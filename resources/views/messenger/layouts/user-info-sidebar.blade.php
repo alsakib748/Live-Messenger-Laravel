@@ -1,10 +1,13 @@
 <div class="wsus__chat_info">
     <div class="wsus__chat_info_header">
+
         <h5>User Details</h5>
         <span class="user_info_close"><i class="far fa-times"></i></span>
+
     </div>
 
     <div class="wsus__chat_info_details">
+
         <div class="user_photo">
             <img src="{{ asset('assets/images/author_img_2.jpg') }}" alt="User" class="img-fluid" />
         </div>
@@ -20,5 +23,6 @@
                 </a>
             </li>
         </ul>
+
     </div>
 </div>
