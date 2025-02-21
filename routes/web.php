@@ -9,7 +9,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/messenger', function () {
+Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
@@ -30,5 +30,7 @@ Route::group(['middleware' => 'auth'], function () {
 
     Route::post('profile', [UserProfileController::class, 'update'])->name('profile.update');
 
+    // todo: Search Route
+    Route::get('messenger/search', [MessengerController::class, 'search'])->name('messenger.search');
 
 });

@@ -1,9 +1,8 @@
 $(function () {
-
     "use strict";
 
     // Favourute user Slider
-    $('.favourite_user_slider').slick({
+    $(".favourite_user_slider").slick({
         slidesToShow: 6,
         slidesToScroll: 1,
         autoplay: false,
@@ -18,64 +17,61 @@ $(function () {
                 breakpoint: 1600,
                 settings: {
                     slidesToShow: 5,
-                }
+                },
             },
             {
                 breakpoint: 1200,
                 settings: {
                     slidesToShow: 4,
-                }
+                },
             },
             {
                 breakpoint: 992,
                 settings: {
                     slidesToShow: 4,
-                }
+                },
             },
             {
                 breakpoint: 768,
                 settings: {
                     slidesToShow: 7,
-                }
+                },
             },
             {
                 breakpoint: 576,
                 settings: {
                     slidesToShow: 4,
-                }
-            }
-        ]
+                },
+            },
+        ],
     });
-
 
     // sidebar search
     $(".input").on("click", function () {
         $(".wsus__user_list").toggleClass("show_search_list");
     });
 
-    $('body').on("click", function (event) {
+    $("body").on("click", function (event) {
         if ($(".wsus__user_list").hasClass("show_search_list")) {
-            if (!$(event.target).closest('.wsus__user_list').length) {
+            if (!$(event.target).closest(".wsus__user_list").length) {
                 $(".wsus__user_list").removeClass("show_search_list");
             }
         }
     });
 
     // user list on click add class
-    $('.wsus__user_list_area .wsus__user_list_item').click(function () {
+    $(".wsus__user_list_area .wsus__user_list_item").click(function () {
         $(".wsus__user_list_area .wsus__user_list_item").removeClass("active");
         $(this).addClass("active");
     });
 
     //===venobox.js===
-    $('.venobox').venobox();
-
+    $(".venobox").venobox();
 
     // emoji js
     $(document).ready(function () {
         $("#example1").emojioneArea();
     });
-
 
     // user info (Right sidebar)
     $(".info").on("click", function () {
@@ -85,7 +81,6 @@ $(function () {
     $(".user_info_close").on("click", function () {
         $(".wsus__chat_app").addClass("show_info");
     });
-
 
     // mobile device change interface
     $(".wsus__favourite_item").on("click", function () {
@@ -113,20 +108,13 @@ $(function () {
         $(".wsus__chat_app").addClass("show_small_chat");
     });
 
-
-
-
-
-
-
-
     // Heght adjustment
     $(document).ready(function () {
         function adjustHeight() {
             var windowHeight = $(window).height() - 120;
-            $('.wsus__chat_area_body').css('height', windowHeight + 'px');
-            $('.wsus__user_list_area_height').css({
-                'max-height': windowHeight - 290 + 'px',
+            $(".wsus__chat_area_body").css("height", windowHeight + "px");
+            $(".wsus__user_list_area_height").css({
+                "max-height": windowHeight - 290 + "px !important",
             });
         }
 
@@ -138,11 +126,4 @@ $(function () {
             adjustHeight();
         });
     });
-
-
-
-
-
-
-
 });
