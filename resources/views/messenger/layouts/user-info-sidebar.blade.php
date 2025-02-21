@@ -6,12 +6,13 @@
 
     </div>
 
-    <div class="wsus__chat_info_details">
+    <div class="wsus__chat_info_details messenger-info-view">
 
         <div class="user_photo">
             <img src="{{ asset('assets/images/author_img_2.jpg') }}" alt="User" class="img-fluid" />
         </div>
         <h3 class="user_name">Hasan Masud</h3>
+        <p class="user_unique_name"></p>
         <a href="#" class="delete_chat">Delete Conversation</a>
         <p class="photo_gallery">Shared Photos</p>
         <span class="nothing_share">Nothing shared yet</span>

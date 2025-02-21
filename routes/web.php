@@ -33,4 +33,8 @@ Route::group(['middleware' => 'auth'], function () {
     // todo: Search Route
     Route::get('messenger/search', [MessengerController::class, 'search'])->name('messenger.search');
 
+    // todo: Fetch user by id
+
+    Route::get('/messenger/id-info',action: [MessengerController::class, 'fetchIdInfo'])->name('messenger.id-info');
+
 });

@@ -4,6 +4,14 @@
  *--------------------------
  */
 
+function enableChatBoxLoader() {
+    $(".wsus__message_paceholder").removeClass("d-none");
+}
+
+function disableChatBoxLoader() {
+    $(".wsus__message_paceholder").addClass("d-none");
+}
+
 function imagePreview(input, selector) {
     if (input.files && input.files[0]) {
         var render = new FileReader();
@@ -93,6 +101,45 @@ function actionOnScroll(selector, callback, topScroll = false) {
 
 /**
  *--------------------------
+ * Fetch id data of user and update the view
+ *--------------------------
+ **/
+
+function IDinfo(id) {
+    $.ajax({
+        url: "/messenger/id-info",
+        type: "GET",
+        data: {
+            id: id,
+        },
+        beforeSend: function () {
+            NProgress.start();
+            enableChatBoxLoader();
+        },
+        success: function (data) {
+            $(".messenger-header").find("img").attr("src", data.fetch.avatar);
+            $(".messenger-header").find("h4").text(data.fetch.name);
+            $(".messenger-info-view .user_photo")
+                .find("img")
+                .attr("src", data.fetch.avatar);
+
+            $(".messenger-info-view").find(".user_name").text(data.fetch.name);
+
+            $(".messenger-info-view")
+                .find(".user_unique_name")
+                .text(data.fetch.user_name);
+
+            NProgress.done();
+            disableChatBoxLoader();
+        },
+        error: function (xhr, status, error) {
+            disableChatBoxLoader();
+        },
+    });
+}
+
+/**
+ *--------------------------
  * On Dom Load
  *--------------------------
  **/
@@ -120,5 +167,12 @@ $(document).ready(function () {
     actionOnScroll(".user_search_list_result", function () {
         let value = $(".user_search").val();
         searchUsers(value);
+    });
+
+    // todo: click action for messenger list item
+    $("body").on("click", ".messenger-list-item", function () {
+        const dataId = $(this).attr("data-id");
+
+        IDinfo(dataId);
     });
 });
