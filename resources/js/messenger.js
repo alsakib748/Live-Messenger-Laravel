@@ -25,7 +25,9 @@ function enableChatBoxLoader() {
 }
 
 function disableChatBoxLoader() {
+    $(".wsus__chat_app").removeClass("show_info");
     $(".wsus__message_paceholder").addClass("d-none");
+    $(".wsus__message_paceholder_black").addClass("d-none");
 }
 
 function imagePreview(input, selector) {
@@ -133,6 +135,8 @@ function IDinfo(id) {
             enableChatBoxLoader();
         },
         success: function (data) {
+            // fetch messages
+            fetchMessages(data.fetch.id, true);
             $(".messenger-header").find("img").attr("src", data.fetch.avatar);
             $(".messenger-header").find("h4").text(data.fetch.name);
             $(".messenger-info-view .user_photo")
@@ -193,6 +197,7 @@ function sendMessage() {
                     );
                 }
 
+                scrollToBottom(messageBoxContainer);
                 messageFormReset();
 
                 // messageForm.trigger("reset");
@@ -251,8 +256,58 @@ function messageFormReset() {
     messageForm.trigger("reset");
 }
 
-// todo: Cancel selected attachment
-function cancelAttachment() {}
+/**
+ *--------------------------
+ * Fetch messages from database
+ *--------------------------
+ **/
+let messagesPage = 1;
+let noMoreMessages = false;
+let messagesLoading = false;
+function fetchMessages(id, newFetch = false) {
+    if (newFetch) {
+        messagesPage = 1;
+        noMoreMessages = false;
+    }
+    if (!noMoreMessages) {
+        $.ajax({
+            method: "GET",
+            url: "/messenger/fetch-messages",
+            data: {
+                _token: csrf_token,
+                id: id,
+                page: messagesPage,
+            },
+            success: function (data) {
+                if (messagesPage == 1) {
+                    messageBoxContainer.html(data.messages);
+                    scrollToBottom(messageBoxContainer);
+                } else {
+                    messageBoxContainer.prepend(data.messages);
+                }
+
+                // todo: pagination lock and page increment
+                noMoreMessages = messagesPage >= data?.last_page;
+                if (!noMoreMessages) messagesPage += 1;
+            },
+            error: function (xhr, status, error) {},
+        });
+    }
+}
+
+/**
+ *--------------------------
+ * Slide to bottom on action
+ *--------------------------
+ **/
+
+function scrollToBottom(container) {
+    $(container)
+        .stop()
+        .animate({
+            scrollTop: $(container)[0].scrollHeight,
+        });
+}
 
 /**
  *--------------------------
@@ -307,4 +362,13 @@ $(document).ready(function () {
     $(".cancel-attachment").on("click", function () {
         messageFormReset();
     });
+
+    // todo: message pagination
+    actionOnScroll(
+        ".wsus__chat_area_body",
+        function () {
+            fetchMessages(getMessengerId());
+        },
+        true
+    );
 });
