@@ -150,7 +150,7 @@ function IDinfo(id) {
                 .text(data.fetch.user_name);
 
             NProgress.done();
-            disableChatBoxLoader();
+            // disableChatBoxLoader();
         },
         error: function (xhr, status, error) {
             disableChatBoxLoader();
@@ -269,7 +269,7 @@ function fetchMessages(id, newFetch = false) {
         messagesPage = 1;
         noMoreMessages = false;
     }
-    if (!noMoreMessages) {
+    if (!noMoreMessages && !messagesLoading) {
         $.ajax({
             method: "GET",
             url: "/messenger/fetch-messages",
@@ -278,19 +278,47 @@ function fetchMessages(id, newFetch = false) {
                 id: id,
                 page: messagesPage,
             },
+            beforeSend: function () {
+                messagesLoading = true;
+                let loader = `
+                <div class="text-center messages-loader">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+               `;
+
+                messageBoxContainer.prepend(loader);
+                // $(".user_search_list_result").append(loader);
+            },
             success: function (data) {
+                messagesLoading = false;
+                // todo: Remove Loader
+                messageBoxContainer.find(".messages-loader").remove();
                 if (messagesPage == 1) {
                     messageBoxContainer.html(data.messages);
                     scrollToBottom(messageBoxContainer);
                 } else {
+                    const lastMsg = $(messageBoxContainer)
+                        .find(".message-card")
+                        .first();
+                    const curOffset =
+                        lastMsg.offset().top - messageBoxContainer.scrollTop();
                     messageBoxContainer.prepend(data.messages);
+                    messageBoxContainer.scrollTop(
+                        lastMsg.offset().top - curOffset
+                    );
                 }
 
                 // todo: pagination lock and page increment
                 noMoreMessages = messagesPage >= data?.last_page;
                 if (!noMoreMessages) messagesPage += 1;
+
+                disableChatBoxLoader();
             },
-            error: function (xhr, status, error) {},
+            error: function (xhr, status, error) {
+                console.log(error);
+            },
         });
     }
 }
