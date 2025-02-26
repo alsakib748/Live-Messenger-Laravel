@@ -43,4 +43,7 @@ Route::group(['middleware' => 'auth'], function () {
     // todo: Fetch Message
     Route::get('/messenger/fetch-messages', [MessengerController::class, 'fetchMessages'])->name('messenger.fetch-messages');
 
+    // todo: Fetch Contacts
+    Route::get('/messenger/fetch-contacts', [MessengerController::class, 'fetchContacts'])->name('messenger.fetch-contacts');
+
 });

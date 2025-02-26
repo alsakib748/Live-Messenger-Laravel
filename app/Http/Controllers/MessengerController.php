@@ -7,6 +7,7 @@ use App\Models\Message;
 use Illuminate\View\View;
 use Illuminate\Http\Request;
 use App\Traits\FileUploadTrait;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 
 class MessengerController extends Controller
@@ -127,4 +128,54 @@ class MessengerController extends Controller
         return response()->json($response);
 
     }
+
+    // todo: Fetch Contacts from database
+    function fetchContacts(Request $request)
+    {
+
+        $users = Message::join('users', function ($join) {
+            $join->on('messages.from_id', '=', 'users.id')
+                ->orOn('messages.to_id', '=', 'users.id');
+        })
+            ->where(function ($q) {
+                $q->where('messages.from_id', Auth::user()->id)
+                    ->orWhere('messages.to_id', Auth::user()->id);
+            })
+            ->where('users.id', '!=', Auth::user()->id)
+            ->select('users.id', 'users.name', 'users.user_name', 'users.avatar', DB::raw('MAX(messages.created_at) as max_created_at'))
+            ->groupBy('users.id', 'users.name', 'users.user_name', 'users.avatar')
+            ->orderBy('max_created_at', 'desc')
+            ->paginate(5);
+
+        if (count($users) > 0) {
+            $contacts = '';
+            foreach ($users as $user) {
+                $contacts .= $this->getContactItem($user);
+            }
+        } else {
+            $contacts = "<p>Your contact list is empty!</p>";
+        }
+
+        return response()->json([
+            'contacts' => $contacts,
+            'last_page' => $users->lastPage()
+        ]);
+
+    }
+
+    function getContactItem($user)
+    {
+        $lastMessage = Message::where('from_id', Auth::user()->id)
+            ->where('to_id', $user->id)
+            ->orWhere('from_id', $user->id)
+            ->where('to_id', Auth::user()->id)
+            ->latest()
+            ->first();
+
+        $unseenCounter = Message::where('from_id', $user->id)->where('to_id', Auth::user()->id)->where('seen', 0)->count();
+
+
+        return view('messenger.components.contact-list-item', compact('lastMessage', 'unseenCounter', 'user'))->render();
+    }
+
 }

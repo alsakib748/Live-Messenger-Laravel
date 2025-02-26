@@ -9,7 +9,8 @@ var temporaryMsgId = 0;
 const messageForm = $(".message-form"),
     messageInput = $(".message-input"),
     messageBoxContainer = $(".wsus__chat_area_body"),
-    csrf_token = $('meta[name="csrf_token"]').attr("content");
+    csrf_token = $('meta[name="csrf_token"]').attr("content"),
+    messengerContactBox = $(".messenger-contacts");
 
 const getMessengerId = () => $("meta[name=id]").attr("content");
 const setMessengerId = (id) => $("meta[name=id]").attr("content", id);
@@ -325,6 +326,57 @@ function fetchMessages(id, newFetch = false) {
 
 /**
  *--------------------------
+ * Fetch Contact list from database
+ *--------------------------
+ **/
+
+let contactsPage = 1;
+let noMoreContacts = false;
+let contactLoading = false;
+
+function getContacts() {
+    if (!contactLoading && !noMoreContacts) {
+        $.ajax({
+            method: "GET",
+            url: "/messenger/fetch-contacts",
+            data: {
+                page: contactsPage,
+            },
+            beforeSend: function () {
+                contactLoading = true;
+                let loader = `
+                <div class="text-center contact-loader">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+               `;
+
+                messengerContactBox.append(loader);
+            },
+            success: function (data) {
+                contactLoading = false;
+                messengerContactBox.find(".contact-loader").remove();
+                if (contactsPage < 2) {
+                    messengerContactBox.html(data.contacts);
+                } else {
+                    messengerContactBox.append(data.contacts);
+                }
+
+                noMoreContacts = contactsPage >= data?.last_page;
+
+                if (!noMoreContacts) contactsPage += 1;
+            },
+            error: function (xhr, status, error) {
+                contactLoading = false;
+                messengerContactBox.find(".contact-loader").remove();
+            },
+        });
+    }
+}
+
+/**
+ *--------------------------
  * Slide to bottom on action
  *--------------------------
  **/
@@ -342,6 +394,8 @@ function scrollToBottom(container) {
  * On Dom Load
  *--------------------------
  **/
+
+getContacts();
 
 $(document).ready(function () {
     $("#select_file").change(function () {
@@ -391,7 +445,7 @@ $(document).ready(function () {
         messageFormReset();
     });
 
-    // todo: message pagination
+    // todo: Message Pagination
     actionOnScroll(
         ".wsus__chat_area_body",
         function () {
@@ -399,4 +453,9 @@ $(document).ready(function () {
         },
         true
     );
+
+    // todo: Contacts Pagination
+    actionOnScroll(".messenger-contacts", function () {
+        getContacts();
+    });
 });
