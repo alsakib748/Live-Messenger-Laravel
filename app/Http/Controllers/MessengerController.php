@@ -145,7 +145,7 @@ class MessengerController extends Controller
             ->select('users.id', 'users.name', 'users.user_name', 'users.avatar', DB::raw('MAX(messages.created_at) as max_created_at'))
             ->groupBy('users.id', 'users.name', 'users.user_name', 'users.avatar')
             ->orderBy('max_created_at', 'desc')
-            ->paginate(5);
+            ->paginate(10);
 
         if (count($users) > 0) {
             $contacts = '';
@@ -176,6 +176,38 @@ class MessengerController extends Controller
 
 
         return view('messenger.components.contact-list-item', compact('lastMessage', 'unseenCounter', 'user'))->render();
+    }
+
+    // todo: Update Contact Item
+    public function updateContactItem(Request $request)
+    {
+        // get user data
+
+        $user = User::where('id', $request->user_id)->first();
+
+        if (!$user) {
+            return response()->json([
+                'message' => "User not found!"
+            ], 401);
+        }
+
+        $contactItem = $this->getContactItem($user);
+
+        return response()->json([
+            'contact_item' => $contactItem
+        ], 200);
+
+    }
+
+    public function makeSeen(Request $request)
+    {
+
+        Message::where('from_id', $request->id)
+            ->where('to_id', Auth::user()->id)
+            ->where('seen', 0)->update(['seen' => 1]);
+
+        return true;
+
     }
 
 }

@@ -11,5 +11,8 @@
             <p>{{ $lastMessage->body }}</p>
         @endif
     </div>
-    <span class="time">{{ $unseenCounter }}</span>
+    {{-- <span class="time"></span> --}}
+    @if ($unseenCounter !== 0)
+        <span class="badge bg-danger text-light unseen_count time">{{ $unseenCounter }}</span>
+    @endif
 </div>
