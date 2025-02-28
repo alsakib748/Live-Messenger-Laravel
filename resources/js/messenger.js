@@ -139,6 +139,10 @@ function IDinfo(id) {
         success: function (data) {
             // fetch messages
             fetchMessages(data.fetch.id, true);
+            data.favorite > 0
+                ? $(".favourite").addClass("active")
+                : $(".favourite").removeClass("active");
+
             $(".messenger-header").find("img").attr("src", data.fetch.avatar);
             $(".messenger-header").find("h4").text(data.fetch.name);
             $(".messenger-info-view .user_photo")
@@ -429,6 +433,33 @@ function makeSeen(status) {
     });
 }
 
+/**
+ *--------------------------
+ * Favorite
+ *--------------------------
+ **/
+
+function star(user_id) {
+    $(".favourite").toggleClass("active");
+
+    $.ajax({
+        method: "POST",
+        url: "/messenger/favorite",
+        data: {
+            _token: csrf_token,
+            id: user_id,
+        },
+        success: function (data) {
+            if (data.status == "added") {
+                notyf.success("Added to favorite list.");
+            } else {
+                notyf.success("Removed from favorite list.");
+            }
+        },
+        error: function (xhr, status, error) {},
+    });
+}
+
 function updateSelectedContent(user_id) {
     $(".messenger-list-item").removeClass("active");
     $(`.messenger-list-item[data-id="${user_id}"]`).addClass("active");
@@ -454,9 +485,11 @@ function scrollToBottom(container) {
  *--------------------------
  **/
 
-getContacts();
-
 $(document).ready(function () {
+    getContacts();
+
+    // fetchFavoritesList();
+
     if (window.innerWidth < 768) {
         $("body").on("click", ".messenger-list-item", function () {
             $(".wsus__user_list").addClass("d-none");
@@ -527,5 +560,12 @@ $(document).ready(function () {
     // todo: Contacts Pagination
     actionOnScroll(".messenger-contacts", function () {
         getContacts();
+    });
+
+    // todo: add/remove to favorite
+    $(".favourite").on("click", function (e) {
+        e.preventDefault();
+        star(getMessengerId());
+        // alert(getMessengerId());
     });
 });

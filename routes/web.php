@@ -52,4 +52,10 @@ Route::group(['middleware' => 'auth'], function () {
     // todo: Fetch Contacts
     Route::post('/messenger/make-seen', [MessengerController::class, 'makeSeen'])->name('messenger.make-seen');
 
+    // todo: Favourite User Route
+    Route::post('/messenger/favorite', [MessengerController::class, 'favorite'])->name('messenger.favorite');
+
+    // todo: Favourite User Route
+    Route::get('/messenger/fetch-favorite', [MessengerController::class, 'fetchFavoritesList'])->name('messenger.fetch-favorite');
+
 });

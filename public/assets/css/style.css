@@ -1155,6 +1155,8 @@ button {
     --bs-spinner-border-width: 2px;
 }
 
+
+
 /*================================
     Chatting Application End
 ================================*/
@@ -1183,3 +1185,15 @@ button {
 .wsus__single_chat.chat_right .clock i {
     font-size: 11px;
 }
+
+.favourite.active{
+    background: var(--colorPrimary) !important;
+}
+
+.favourite.active i{
+    color: var(--colorWhite) !important;
+}
+
+/*================================
+    Chatting Application End
+================================*/

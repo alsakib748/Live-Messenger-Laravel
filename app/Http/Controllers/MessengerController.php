@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Favorite;
 use App\Models\User;
 use App\Models\Message;
 use Illuminate\View\View;
@@ -17,7 +18,8 @@ class MessengerController extends Controller
 
     public function index(): View
     {
-        return view('messenger.index');
+        $favoriteList = Favorite::with('user:id,name,avatar')->where('user_id', Auth::user()->id)->get();
+        return view('messenger.index', compact('favoriteList'));
     }
 
     // todo: Search user profiles
@@ -56,8 +58,11 @@ class MessengerController extends Controller
     {
         $fetch = User::where('id', $request->id)->first();
 
+        $favorite = Favorite::where(['user_id' => Auth::user()->id, 'favorite_id' => $fetch->id])->exists();
+
         return response()->json([
-            'fetch' => $fetch
+            'fetch' => $fetch,
+            'favorite' => $favorite
         ]);
     }
 
@@ -209,5 +214,32 @@ class MessengerController extends Controller
         return true;
 
     }
+
+    // todo: Add/Remove to favorite list
+
+    public function favorite(Request $request)
+    {
+
+        $request->validate([
+            'id' => ['required', 'integer']
+        ]);
+
+        $query = Favorite::where(['user_id' => Auth::user()->id, 'favorite_id' => $request->id]);
+
+        $favoriteStatus = $query->exists();
+
+        if (!$favoriteStatus) {
+            $star = new Favorite();
+            $star->user_id = Auth::user()->id;
+            $star->favorite_id = $request->id;
+            $star->save();
+            return response(['status' => 'added']);
+        } else {
+            $query->delete();
+            return response(['status' => 'removed']);
+        }
+
+    }
+
 
 }
