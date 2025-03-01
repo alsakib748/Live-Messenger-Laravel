@@ -58,4 +58,7 @@ Route::group(['middleware' => 'auth'], function () {
     // todo: Favourite User Route
     Route::get('/messenger/fetch-favorite', [MessengerController::class, 'fetchFavoritesList'])->name('messenger.fetch-favorite');
 
+    // todo: Favourite User Route
+    Route::delete('/messenger/delete-message', [MessengerController::class, 'deleteMessage'])->name('messenger.delete-message');
+
 });

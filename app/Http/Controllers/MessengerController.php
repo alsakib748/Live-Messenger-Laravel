@@ -256,5 +256,21 @@ class MessengerController extends Controller
 
     }
 
+    // todo: Delete Message
+
+    function deleteMessage(Request $request)
+    {
+        // dd($request->all());
+        $message = Message::findOrFail($request->message_id);
+
+        if ($message->from_id == Auth::user()->id) {
+            $message->delete();
+            return response()->json([
+                'id' => $request->message_id
+            ], 200);
+        }
+
+        return;
+    }
 
 }
